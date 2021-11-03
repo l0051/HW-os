@@ -5,6 +5,71 @@
 
 #define BUFFER_SIZE 16
 
+// copying segment of data
+void copy_segment(int source, int destination, off_t begin, off_t end)
+{
+	// set cursor in source file
+	int cursor = lseek(source, begin, SEEK_SET);
+
+	// check if could not set cursor in source file
+	if (cursor < 0)
+	{
+		std::cerr << "Could not set cursor in source file due to error " << errno << std::endl;
+		exit(errno);
+	}
+
+	// set cursor in destination file
+	cursor = lseek(destination, begin, SEEK_SET);
+
+	// check if could not set cursor in destination file
+	if (cursor < 0)
+	{
+		std::cerr << "Could not set cursor in destination file due to error " << errno << std::endl;
+		exit(errno);
+	}
+
+
+	// allocate a buffer to read from file
+	char* buffer = new char[MAX_BUFFER_SIZE];
+
+	// start copying
+	while (true)
+	{
+		// set buffer_size
+		int buffer_size = std::min((int)(end - lseek(source, 0, SEEK_CUR)), MAX_BUFFER_SIZE);
+
+		// read buffer_size bytes from source file into buffer
+		int readBytes = read(source, buffer, buffer_size);
+
+		// check if could not read due to error
+		if (readBytes < 0)
+		{
+			std::cerr << "Could not read from source file due to error " << errno << std::endl;
+			exit(errno);
+		}
+
+		// stop reading because reached the end
+		if ((int)lseek(source, 0, SEEK_CUR) == end)
+		{
+			break;
+		}
+
+		// write buffer into destination file
+		int writeBytes = write(destination, buffer, readBytes);
+
+		//check if could not write due to error
+		if (write < 0)
+		{
+			std::cerr << "Could not write into destination file due to error " << errno << std::endl;
+			exit(errno);
+		}
+	}
+
+	// delete allocated memory
+	delete[] buffer;
+
+}
+
 int main(int argc, char** argv)
 {
 	// check if amount of arguments is right
@@ -40,41 +105,7 @@ int main(int argc, char** argv)
 		exit(errno);
 	}
 
-	// allocate a buffer to read from file
-	char* buffer = new char[BUFFER_SIZE];
-
-	// start copying
-	while (true)
-	{
-		// read BUFFER_SIZE bytes from source file into buffer
-		int readBytes = read(source, buffer, BUFFER_SIZE);
-
-		// check if could not read due to error
-		if (readBytes < 0)
-		{
-			std::cerr << "Could not read from source file due to error " << errno << std::endl;
-			exit(errno);
-		}
-
-		// stop reading because reached the end
-		if (readBytes == 0)
-		{
-			break;
-		}
-
-		// write buffer into destination file
-		int writeBytes = write(destination, buffer, readBytes);
-
-		//check if could not write due to error
-		if (write < 0)
-		{
-			std::cerr << "Could not write into destination file due to error " << errno << std::endl;
-			exit(errno);
-		}
-	}
-
-	// delete allocated memory
-	delete[] buffer;
+	//copy
 
 	// close source file
 	close(source);
