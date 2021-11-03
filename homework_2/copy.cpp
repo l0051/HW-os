@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 16
+#define MAX_BUFFER_SIZE 16
 
 // copying segment of data
 void copy_segment(int source, int destination, off_t begin, off_t end)
@@ -105,7 +105,44 @@ int main(int argc, char** argv)
 		exit(errno);
 	}
 
-	//copy
+	// get first data segment begin
+	off_t data = lseek(source, 0, SEEK_DATA);
+
+	while (true)
+	{
+		// get next hole segment begin
+		off_t hole = lseek(source, data, SEEK_HOLE);
+
+		// check if something went wrong due to error
+		if (hole < 0)
+		{
+			// check if didn't reached the end of file
+			if (errno != ENXIO)
+			{
+				std::cerr << "Something went wrong, error " << errno << std::endl;
+				exit(errno);
+			}
+			break;
+		}
+
+		// copy that segment of data
+		copy_segment(source, destination, data, hole);
+
+		// get next data segment begin
+		data = lseek(source, hole, SEEK_DATA);
+
+		// check if something went wrong due to error
+		if (data < 0)
+		{
+			// check if didn't reached the end of file
+			if (errno != ENXIO)
+			{
+				std::cerr << "Something went wrong, error " << errno << std::endl;
+				exit(errno);
+			}
+			break;
+		}
+	}
 
 	// close source file
 	close(source);
