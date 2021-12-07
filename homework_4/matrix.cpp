@@ -48,6 +48,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
 		        args[k].last_i = m;
 		    args[k].first_j = 0;
             args[k].last_j = n;
+            args[k].matrix = &matrix;
             int result = pthread_create(&threads[k], NULL, countSum, &args[k]);
 		    if(result != 0)
 		    {
@@ -65,6 +66,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
 		        args[k].last_j = n;
 		    args[k].first_i = 0;
             args[k].last_i = m;
+            args[k].matrix = &matrix;
             int result = pthread_create(&threads[k], NULL, countSum, &args[k]);
 		    if(result != 0)
 		    {
@@ -80,6 +82,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
             args[0].last_j = n;
 		    args[0].first_i = 0;
             args[0].last_i = m;
+            args[0].matrix = &matrix;
             int result = pthread_create(&threads[0], NULL, countSum, &args[0]);
 		    if(result != 0)
 		    {
@@ -96,6 +99,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
                     args[k].last_i = i + 1;
                     args[k].first_j = j;
                     args[k].last_j = j + 1;
+                    args[k].matrix = &matrix;
                     int result = pthread_create(&threads[k], NULL, countSum, &args[k]);
 		            if(result != 0)
 		            {
@@ -108,6 +112,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
                     args[k].last_i = m;
                     args[k].first_j = j;
                     args[k].last_j = n;
+                    args[k].matrix = &matrix;
                     int result = pthread_create(&threads[k], NULL, countSum, &args[k]);
 		            if(result != 0)
 		            {
@@ -141,6 +146,7 @@ void ParallelMatrix::init()
     {
         for (int j = 0; j < n; ++j)
         {
+            srand((unsigned) time(0));
             matrix[i][j] = rand();
         }
     }
