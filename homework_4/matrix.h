@@ -4,6 +4,7 @@
 #include<pthread.h>
 #include <chrono>
 
+// structer for thread arguments
 struct Args
 {
     int first_i;
@@ -12,6 +13,7 @@ struct Args
     int last_j;
     std::vector<std::vector<int>>* matrix;
 
+    // constructer
     Args()
         : first_i(0)
         , first_j(0)
@@ -23,7 +25,7 @@ struct Args
 
 void* countSum(void* args);
 
-
+// matrix data structure
 class ParallelMatrix
 {
 private:
@@ -32,18 +34,26 @@ private:
     
     std::vector<std::vector<int>> matrix;
 public:
+
+    // constructer
     ParallelMatrix(int m = 1, int n = 1)
         : m(m)
         , n(n)
         , matrix(std::vector<std::vector<int>>(m, std::vector<int>(n)))
     {}
 
+    // calculates sum of all cells in the matrix
     int sum();
+
+    // calculates the sum of all cells using threads 
     int sumParallel(int threadsNum);
+
+    // initializes all the cells with random integers
     void init();
 };
 
-
+// measures the times of sumParallel
 void measureTime(ParallelMatrix& matrix, int arg, int (ParallelMatrix::*func)(int));
 
+// measures the times of sum
 void measureTime(ParallelMatrix& matrix, int (ParallelMatrix::*func)());
