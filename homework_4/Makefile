@@ -1,8 +1,13 @@
-matrix: matrix.o
-	g++ matrix.o -o matrix
+all: matrix
 
-matrix.o: matrix.cpp
-	g++ -c matrix.cpp -o matrix.o
+main: main.o matrix.o
+	g++ main.o matrix.o -o main
+
+matrix.o: main.cpp matrix.h
+	g++ -c matrix.cpp
+
+main.o: main.cpp
+	g++ -c main.cpp
 
 clean:
-	rm matrix.o matrix
+	rm *.o main
