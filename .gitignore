@@ -1,2 +1,9 @@
+#object files
+*.o
+
+#executeble files
+main
+*.out
+
 #homework_2 build files
 homework_2/build/
