@@ -1,5 +1,34 @@
 #include "matrix.h"
 
+void measureTime(ParallelMatrix& matrix, int arg, int (ParallelMatrix::*func)(int))
+{
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+
+    auto t1 = high_resolution_clock::now();
+    (matrix.*func)(arg);
+    auto t2 = high_resolution_clock::now();
+
+    duration<double, std::milli> msDouble = t2 - t1;
+    std::cout << msDouble.count() << "ms" << " ";
+    
+}
+
+void measureTime(ParallelMatrix& matrix, int (ParallelMatrix::*func)())
+{
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+
+    auto t1 = high_resolution_clock::now();
+    (matrix.*func)();
+    auto t2 = high_resolution_clock::now();
+
+    duration<double, std::milli> msDouble = t2 - t1;
+    std::cout << msDouble.count() << "ms" << " ";
+}
+
 void* countSum(void* args)
 {
     Args* submatrixArg = (Args*) args;

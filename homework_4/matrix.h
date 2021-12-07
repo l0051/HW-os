@@ -2,6 +2,7 @@
 #include<vector>
 #include<stdlib.h>
 #include<pthread.h>
+#include <chrono>
 
 struct Args
 {
@@ -22,6 +23,7 @@ struct Args
 
 void* countSum(void* args);
 
+
 class ParallelMatrix
 {
 private:
@@ -40,3 +42,8 @@ public:
     int sumParallel(int threadsNum);
     void init();
 };
+
+
+void measureTime(ParallelMatrix& matrix, int arg, int (ParallelMatrix::*func)(int));
+
+void measureTime(ParallelMatrix& matrix, int (ParallelMatrix::*func)());
