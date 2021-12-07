@@ -40,7 +40,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
     Args* args = new Args[threadsNum]; 
     if (threadsNum <= m)
     {        
-        for (int i = 0, k = 0; i <= m && k < threadsNum; i += m / threadsNum, ++k)
+        for (int i = 0, k = 0; i < m && k < threadsNum; i += m / threadsNum, ++k)
         {
             args[k].first_i = i;
             args[k].last_i = i + m / threadsNum;
@@ -57,7 +57,7 @@ int ParallelMatrix::sumParallel(int threadsNum)
     }
     else if (threadsNum <= n)
     {
-        for (int i = 0, k = 0; i <= n && k < threadsNum; i += n / threadsNum, ++k)
+        for (int i = 0, k = 0; i < n && k < threadsNum; i += n / threadsNum, ++k)
         {
             args[k].first_j = i;
             args[k].last_j = i + n / threadsNum;
@@ -119,14 +119,16 @@ int ParallelMatrix::sumParallel(int threadsNum)
         
     }
     void* submatrixSum;
-    for (int i = 0; i <= threadsNum; ++i)
+    for (int i = 0; i < threadsNum; ++i)
     {
         int joined = pthread_join(threads[i], &submatrixSum);
         if (joined != 0)
         {
             exit(joined);
         }
-        sum += *((int *) submatrixSum);
+        int* submatrixSumInt = (int*) submatrixSum;
+        sum += *submatrixSumInt;
+        delete submatrixSumInt;
     }
     delete [] threads;
     delete [] args;
