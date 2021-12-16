@@ -1,7 +1,7 @@
 #include <iostream>
 #include <queue>
-#include <functional>
 #include <pthread.h>
+
 
 
 class ParallelScheduler
@@ -24,8 +24,8 @@ public:
 private:
     int capacity;
     pthread_t* threads;
-    std::queue<std::function<void(void*)>> functions;
-
+    std::queue<void(*)(void*)> functions;
+    
     pthread_mutex_t*  mutex = new pthread_mutex_t;
     pthread_cond_t* cond = new pthread_cond_t;
 

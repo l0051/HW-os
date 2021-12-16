@@ -11,5 +11,6 @@ void ParallelScheduler::function(void (*start_routine)(void*), void* arg)
 
 void ParallelScheduler::run(void (*start_routine)(void*), void* arg)
 {
-    function(start_routine, arg);
+    functions.push(start_routine);
+    //function(start_routine, arg);
 }
