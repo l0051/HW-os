@@ -53,10 +53,11 @@ private:
     int capacity;
     pthread_t* threads;
     std::queue<void(*)(void*)> functions;
+    std::queue<void*> arguments;
     
     pthread_mutex_t*  mutex;
     pthread_cond_t* cond;
 
-    void function(void (*start_routine)(void*), void* arg);
+    void function();
 
 };

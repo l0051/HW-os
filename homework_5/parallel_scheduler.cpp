@@ -1,13 +1,13 @@
 #include "parallel_scheduler.h"
 
-void ParallelScheduler::function(void (*start_routine)(void*), void* arg)
+void ParallelScheduler::function()
 {
     // mutex ...
     pthread_mutex_lock(mutex);
     pthread_cond_wait(cond, mutex);
     
     //....
-    functions.front()(arg);//arg dismatch
+    functions.front()(arguments.front());
     //....
     
     pthread_mutex_unlock(mutex);
@@ -18,5 +18,6 @@ void ParallelScheduler::function(void (*start_routine)(void*), void* arg)
 void ParallelScheduler::run(void (*start_routine)(void*), void* arg)
 {
     functions.push(start_routine);
-    function(start_routine, arg);
+    arguments.push(arg);
+    function();
 }
