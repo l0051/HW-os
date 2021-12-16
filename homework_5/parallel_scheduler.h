@@ -2,8 +2,6 @@
 #include <queue>
 #include <pthread.h>
 
-
-
 class ParallelScheduler
 {
 public:
