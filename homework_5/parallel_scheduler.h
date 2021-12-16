@@ -24,6 +24,11 @@ public:
             std::cerr << "Error while initializing a condition variable" << std::endl;
 			exit(cond_init);
         }
+
+        for (int i = 0; i < capacity; ++i)
+        {
+            pthread_create(&threads[i], NULL, this->function, NULL);
+        }
     }
 
     ~ParallelScheduler()
@@ -58,6 +63,6 @@ private:
     pthread_mutex_t*  mutex;
     pthread_cond_t* cond;
 
-    void function();
+    void* function(void*);
 
 };
