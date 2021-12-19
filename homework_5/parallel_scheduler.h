@@ -2,6 +2,23 @@
 #include <queue>
 #include <pthread.h>
 
+struct Args
+{
+    int* capacity;
+    std::queue<void(*)(void*)>* functions;
+    std::queue<void*>* arguments;
+    pthread_mutex_t** mutex;
+    pthread_cond_t** cond;
+
+    Args()
+        : capacity(nullptr)
+        , functions(nullptr)
+        , arguments(nullptr)
+        , mutex(nullptr)
+        , cond(nullptr)
+    {}
+};
+
 class ParallelScheduler
 {
 public:
@@ -24,11 +41,6 @@ public:
             std::cerr << "Error while initializing a condition variable" << std::endl;
 			exit(cond_init);
         }
-
-        for (int i = 0; i < capacity; ++i)
-        {
-            pthread_create(&threads[i], NULL, this->function, NULL);
-        }
     }
 
     ~ParallelScheduler()
@@ -49,7 +61,7 @@ public:
         
         delete cond;
         delete mutex;
-        delete threads;
+        delete [] threads;
     }
 
     void run(void (*start_routine)(void*), void* arg);
@@ -60,9 +72,11 @@ private:
     std::queue<void(*)(void*)> functions;
     std::queue<void*> arguments;
     
-    pthread_mutex_t*  mutex;
+    pthread_mutex_t* mutex;
     pthread_cond_t* cond;
-
-    void* function(void*);
-
+    
+    //void* function(void*);
+    void smth();
 };
+
+void* function(void* args_void);
