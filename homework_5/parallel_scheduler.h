@@ -76,7 +76,13 @@ public:
         
         for (int i = 0; i < capacity; ++i)
         {
-            pthread_join(threads[i], NULL);
+            int joined = pthread_join(threads[i], NULL);
+
+            if (joined != 0)
+            {
+                std::cerr << "Error while joining thread" << std::endl;
+                exit(joined);
+            }
         }
 
         delete cond;
