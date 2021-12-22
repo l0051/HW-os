@@ -2,6 +2,9 @@
 #include <queue>
 #include <pthread.h>
 
+void* function(void* args_void);
+
+
 struct Args
 {
     int* capacity;
@@ -10,12 +13,12 @@ struct Args
     pthread_mutex_t** mutex;
     pthread_cond_t** cond;
 
-    Args()
-        : capacity(nullptr)
-        , functions(nullptr)
-        , arguments(nullptr)
-        , mutex(nullptr)
-        , cond(nullptr)
+    Args(int* capacity, std::queue<void(*)(void*)>* functions, std::queue<void*>* arguments, pthread_mutex_t** mutex, pthread_cond_t** cond)
+        : capacity(capacity)
+        , functions(functions)
+        , arguments(arguments)
+        , mutex(mutex)
+        , cond(cond)
     {}
 };
 
@@ -40,6 +43,18 @@ public:
         {
             std::cerr << "Error while initializing a condition variable" << std::endl;
 			exit(cond_init);
+        }
+
+        Args* args = new Args(&capacity, &functions, &arguments, &mutex, &cond);
+        void* args_void = (void*) args;
+        for (int i = 0; i < capacity; ++i)
+        {
+            int result = pthread_create(&threads[i], NULL, function, args_void);
+            if (result != 0)
+            {
+                std::cerr << "Error while creating thread" << std::endl;
+                exit(result);
+            }
         }
     }
 
@@ -74,9 +89,4 @@ private:
     
     pthread_mutex_t* mutex;
     pthread_cond_t* cond;
-    
-    //void* function(void*);
-    void smth();
 };
-
-void* function(void* args_void);
