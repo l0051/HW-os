@@ -5,29 +5,21 @@ void* function(void* args_void)
     while (true)
     {
         Args* args = (Args*) args_void;
-        // mutex ...
+
         while (!(*(args->functions)).empty())
         {
             pthread_mutex_lock(*(args->mutex));    
-
-            //....
             
-            (*(args->functions)).front()((*(args->arguments)).front());
+            auto current_func = (*(args->functions)).front();
+            auto current_arg = (*(args->arguments)).front();
+
             (*(args->functions)).pop();
             (*(args->arguments)).pop();
-
-            //
-            /*
-            if ((*(args->functions)).size() <= *(args->capacity))
-            {
-                pthread_cond_signal(*(args->cond));
-            }
-            //....
-            */
             
             pthread_mutex_unlock(*(args->mutex));
+            current_func(current_arg);
         }
-        // ...
+        
         while ((*(args->functions)).empty())
         {
             
