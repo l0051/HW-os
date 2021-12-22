@@ -5,7 +5,6 @@ void* function(void* args_void)
     while (true)
     {
         Args* args = (Args*) args_void;
-
         while (!(*(args->functions)).empty())
         {
             pthread_mutex_lock(*(args->mutex));    

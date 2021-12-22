@@ -74,6 +74,11 @@ public:
 			exit(mutex_destroy);
         }
         
+        for (int i = 0; i < capacity; ++i)
+        {
+            pthread_join(threads[i], NULL);
+        }
+
         delete cond;
         delete mutex;
         delete [] threads;

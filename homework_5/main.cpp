@@ -24,7 +24,6 @@ int main()
 {
 	int n = 4;
 	ParallelScheduler p_s(n);
-
 	p_s.run(f1, nullptr);
 	p_s.run(f2, nullptr);
 	p_s.run(f3, nullptr);
