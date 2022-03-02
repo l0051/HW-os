@@ -1,4 +1,4 @@
-all: main
+all: signal_handling
 
 signal_handling: signal_handling.o
 	g++ signal_handling.o -o signal_handling
