@@ -3,6 +3,8 @@
 #include <ucontext.h>
 #include <string.h>
 #include <unistd.h>
+#include <pwd.h>
+#include <sys/types.h>
 
 // signal handler
 void signal_handler(int sig, siginfo_t * info, void *ucontext)
@@ -14,9 +16,11 @@ void signal_handler(int sig, siginfo_t * info, void *ucontext)
     std::cout << "PID: " << info->si_pid << std::endl;
     std::cout << "UID: " << info->si_uid << std::endl;
     
+    std::cout << "Username: " << *(getpwuid(info->si_uid)->pw_name) << std::endl;
+
     // cast void* to ucontext_t*
     ucontext_t* context = (ucontext_t*)ucontext;
-    
+
     // registers
     std::cout << "EIP: " << context->uc_mcontext.gregs[REG_RIP] << std::endl;
     std::cout << "EAX: " << context->uc_mcontext.gregs[REG_RAX] << std::endl;
