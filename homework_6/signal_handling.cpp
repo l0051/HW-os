@@ -23,9 +23,9 @@ void signal_handler(int sig, siginfo_t * info, void *ucontext)
     ucontext_t* context = (ucontext_t*)ucontext;
 
     // registers
-    std::cout << "EIP: " << context->uc_mcontext.gregs[REG_RIP] << std::endl;
-    std::cout << "EAX: " << context->uc_mcontext.gregs[REG_RAX] << std::endl;
-    std::cout << "EBX: " << context->uc_mcontext.gregs[REG_RBX] << std::endl;
+    std::cout << "EIP: " << (long long)(context->uc_mcontext.gregs[REG_RIP]) << std::endl;
+    std::cout << "EAX: " << (long long)(context->uc_mcontext.gregs[REG_RAX]) << std::endl;
+    std::cout << "EBX: " << (long long)(context->uc_mcontext.gregs[REG_RBX]) << std::endl;
 }
 
 int main()
