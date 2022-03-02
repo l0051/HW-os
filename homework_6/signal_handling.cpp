@@ -33,6 +33,8 @@ int main()
 
     action.sa_flags = SA_SIGINFO;
     action.sa_sigaction = signal_handler;
+
+    sigaction(SIGUSR1, &action, NULL);
     while (true)
     {
         sleep(10);
