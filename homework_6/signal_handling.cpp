@@ -31,7 +31,6 @@ int main()
     // fill struct memory with 0
     memset(&action, 0, sizeof(action));
 
-    // 
     action.sa_flags = SA_SIGINFO;
     action.sa_sigaction = signal_handler;
     while (true)
