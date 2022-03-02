@@ -15,8 +15,9 @@ void signal_handler(int sig, siginfo_t * info, void *ucontext)
     }
     std::cout << "PID: " << info->si_pid << std::endl;
     std::cout << "UID: " << info->si_uid << std::endl;
-    
-    std::cout << "Username: " << *(getpwuid(info->si_uid)->pw_name) << std::endl;
+    char* username = (getpwuid(info->si_uid)->pw_name);
+    std::string username_string = (std::string) username;
+    std::cout << "Username: " << username_string << std::endl;
 
     // cast void* to ucontext_t*
     ucontext_t* context = (ucontext_t*)ucontext;
