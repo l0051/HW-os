@@ -12,7 +12,6 @@ int main()
 {
     int shared_fd = shm_open("/prod-cons-buffer", O_CREAT | O_WRONLY, S_IWGRP);
 
-    
     ftruncate(shared_fd, getpagesize());
     
     void* shared_pointer_void = mmap(NULL, BUFFER_SIZE, PROT_WRITE, PROT_WRITE, shared_fd, 0);
@@ -44,5 +43,5 @@ int main()
     delete sem_shared;
     sem_unlink("/empty");
     sem_unlink("/full");
-    //int shm_unlink(const char *name); //?
+    shm_unlink("/prod-cons-buffer");
 }

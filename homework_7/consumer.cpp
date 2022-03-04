@@ -47,5 +47,5 @@ int main()
     delete sem_shared;
     sem_unlink("/empty");
     sem_unlink("/full");
-    
+    shm_unlink("/prod-cons-buffer");
 }
