@@ -5,12 +5,14 @@
 #include <unistd.h>
 #include <semaphore.h>
 
-const size_t BUFFER_SIZE = 100; // page size !
+const size_t BUFFER_SIZE = getpagesize();
 
 int main()
 {
     int shared_fd = shm_open("/prod-cons-buffer", O_CREAT | O_RDONLY, S_IRGRP);
     
+    ftruncate(shared_fd, getpagesize());
+
     sem_t* sem_shared = new sem_t;
 
     sem_t* sem_full = sem_open("/full", O_CREAT, 777, BUFFER_SIZE);
@@ -30,7 +32,7 @@ int main()
     sem_destroy(sem_shared);
     sem_close(sem_empty);
     sem_close(sem_full);
-    
+
     sem_unlink("/empty");
     sem_unlink("/full");
     
