@@ -1,10 +1,10 @@
 all: producer consumer
 
 produser: produser.o
-	g++ produser.o -o produser
+	g++ produser.o -o produser -lrt
 
 consumer: consumer.o
-	g++ consumer.o -o consumer
+	g++ consumer.o -o consumer -lrt
 
 produser.o: produser.cpp
 	g++ -c produser.cpp
