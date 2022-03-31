@@ -142,7 +142,8 @@ int main()
         // parent process
         if (pid > 0)
         {
-            wait(NULL);
+            int status;
+			waitpid(-1, &status, 0);
             close(((pipefd_index[i]).pipefd)[0]);
             close(((pipefd_index[i]).pipefd)[1]);
             close(((pipefd_sum[i]).pipefd)[1]);
