@@ -85,11 +85,10 @@ int main()
             indexes[1] = (i + 1 == m) ? n : ((n / m) * (i + 1)); // last end
             void * indexes_void = (void *) &indexes;
             write(pipefd_index[0], indexes_void, 2 * sizeof(size_t));
+            wait(NULL);
         }
     }
-
-    wait(NULL);
-
+    
     long long int sum = 0;
     for (size_t i = 0; i < m; ++i)
     {
