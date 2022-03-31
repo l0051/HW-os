@@ -141,6 +141,7 @@ int main()
         {
             close(((pipefd_index[i]).pipefd)[0]);
             close(((pipefd_sum[i]).pipefd)[1]);
+
             // for subsums
             void * sum_void;
             // read subsums
@@ -156,6 +157,7 @@ int main()
 
             // count sum
             sum += *sub_sum;
+    
         }
     }
 
@@ -165,5 +167,7 @@ int main()
     std::cout << "\n" << sum << std::endl;
 
     // allocate memory
+    delete [] pipefd_sum;
+    delete [] pipefd_index;
     delete [] array;
 }
