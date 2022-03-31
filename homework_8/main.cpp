@@ -99,19 +99,19 @@ int main()
             // error handling
             if (res < 0)
             {
-                std::cerr << "Error while reading " << errno <<std::endl;
+                std::cerr << "Error while reading- " << errno <<std::endl;
                 exit(errno);
             }
 
             // count subsum
-            long long int subsum = 0;
+            long long int sub_sum = 0;
             for (size_t j = indexes[0]; j < indexes[1]; ++j)
             {
-                subsum += array[j];
+                sub_sum += array[j];
             }
-            std::cout << subsum << " ";
+            std::cout << sub_sum << " ";
             // cast to void *
-            void * subsum_void = (void *) subsum;
+            void * subsum_void = (void *) &sub_sum;
             // write subsum
             res = write(pipefd_sum[1], subsum_void, sizeof(long long int)); 
             
@@ -137,7 +137,7 @@ int main()
             // error handling
             if (res < 0)
             {
-                std::cerr << "Error while reading " << errno <<std::endl;
+                std::cerr << "Error while reading() " << errno <<std::endl;
                 exit(errno);
             }
             long long int * sub_sum = (long long *) sum_void;
