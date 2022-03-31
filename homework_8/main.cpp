@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -21,24 +20,30 @@ int main()
     // get number of paralell workers
     size_t m;
     std::cin >> m;
+    
+    // variable for error handling
+    int res;
 
-    int pipefd_sum[2];
-    int res_sum = pipe(pipefd_sum);
+    // make a pipe for subsum
+    int pipefd_sum[2];    
+    res = pipe(pipefd_sum);
 
     // error handling
-    if (res_sum < 0)
+    if (res < 0)
     {
         std::cerr << "Error while creating pipe " << errno <<std::endl;
         exit(errno);
     }
 
+    // make m child process
     for (size_t i = 0; i < m; ++i)
     {
+        // make a pipe for i, j
         int pipefd_index[2];
-        int res_index = pipe(pipefd_index);
+        res = pipe(pipefd_index);
 
         // error handling
-        if (res_index < 0)
+        if (res < 0)
         {
             std::cerr << "Error while creating pipe " << errno <<std::endl;
             exit(errno);
@@ -59,18 +64,39 @@ int main()
         {
             close(pipefd_index[0]);
             close(pipefd_sum[1]);
-            size_t * indexes = new size_t[2];
-            void * indexes_void = (void *) &indexes;
-            read(pipefd_index[1], indexes_void, 2 * sizeof(size_t));
-            
+
+            // for reading i, j
+            void * indexes_void;
+            // read i, j
+            res = read(pipefd_index[1], indexes_void, 2 * sizeof(size_t));
+            // cast to size_t  *
+            size_t * indexes = (size_t *) indexes_void;
+
+            // error handling
+            if (res < 0)
+            {
+                std::cerr << "Error while reading " << errno <<std::endl;
+                exit(errno);
+            }
+
+            // count subsum
             long long int sum = 0;
             for (size_t j = indexes[0]; j < indexes[1]; ++j)
             {
                 sum += array[j];
             }
             std::cout << sum << " ";
+            // cast to void *
             void * sum_void = (void *) sum;
-            write(pipefd_sum[0], sum_void, sizeof(long long int)); 
+            // write subsum
+            res = write(pipefd_sum[0], sum_void, sizeof(long long int)); 
+            
+            // error handling
+            if (res < 0)
+            {
+                std::cerr << "Error while writing " << errno <<std::endl;
+                exit(errno);
+            }
             exit(0);
         }
 
@@ -80,27 +106,55 @@ int main()
             close(pipefd_index[1]);
             close(pipefd_sum[0]);
             close(pipefd_sum[1]); 
+
+            // for writing i, j
             size_t * indexes = new size_t[2];
+            // count i, j
             indexes[0] = (n / m) * i;
             indexes[1] = (i + 1 == m) ? n : ((n / m) * (i + 1)); // last end
+            // cast to void *
             void * indexes_void = (void *) &indexes;
-            write(pipefd_index[0], indexes_void, 2 * sizeof(size_t));
+
+            // write indexes
+            res = write(pipefd_index[0], indexes_void, 2 * sizeof(size_t));
+            
+            // error handling
+            if (res < 0)
+            {
+                std::cerr << "Error while writing " << errno <<std::endl;
+                exit(errno);
+            }
+
+            // ????????????????????????/
+            // wait the end of child
             wait(NULL);
         }
     }
-    
-    long long int sum = 0;
 
     close(pipefd_sum[0]);
+    // for subsums
     void * sum_void;
-    read(pipefd_sum[1], sum_void, sizeof(long long int) * m);
+    // read subsums
+    res = read(pipefd_sum[1], sum_void, sizeof(long long int) * m);
+
+    // error handling
+    if (res < 0)
+    {
+        std::cerr << "Error while reading " << errno <<std::endl;
+        exit(errno);
+    }
+
+    // count sum
+    long long int sum = 0;
     long long int * sub_sum = (long long *) sum_void;
     for (int i = 0; i < m; ++i)
     {
         sum += sub_sum[i];
     }
 
+    // print sum
     std::cout << "\n" << sum << std::endl;
 
+    // allocate memory
     delete [] array;
 }
