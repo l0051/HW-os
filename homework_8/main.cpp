@@ -115,6 +115,7 @@ int main()
                 exit(errno);
             }
 
+            close(((pipefd_index[i]).pipefd)[0]);
             // count subsum
             long long int sub_sum = 0;
             for (size_t j = indexes[0]; j < indexes[1]; ++j)
@@ -133,6 +134,8 @@ int main()
                 std::cerr << "Error while writing " << errno <<std::endl;
                 exit(errno);
             }
+
+            close(((pipefd_sum[i]).pipefd)[1]);
             exit(0);
         }
 
@@ -140,6 +143,7 @@ int main()
         if (pid > 0)
         {
             close(((pipefd_index[i]).pipefd)[0]);
+            close(((pipefd_index[i]).pipefd)[1]);
             close(((pipefd_sum[i]).pipefd)[1]);
 
             // for subsums
@@ -153,6 +157,8 @@ int main()
                 std::cerr << "Error while reading " << errno <<std::endl;
                 exit(errno);
             }
+
+            close(((pipefd_sum[i]).pipefd)[0]);
             long long int * sub_sum = (long long int *) sum_void;
 
             // count sum
@@ -170,4 +176,5 @@ int main()
     delete [] pipefd_sum;
     delete [] pipefd_index;
     delete [] array;
+
 }
