@@ -142,6 +142,7 @@ int main()
         // parent process
         if (pid > 0)
         {
+            wait(NULL);
             close(((pipefd_index[i]).pipefd)[0]);
             close(((pipefd_index[i]).pipefd)[1]);
             close(((pipefd_sum[i]).pipefd)[1]);
@@ -166,8 +167,6 @@ int main()
     
         }
     }
-
-    wait(NULL);
 
     // print sum
     std::cout << "\n" << sum << std::endl;
