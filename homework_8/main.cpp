@@ -90,14 +90,17 @@ int main()
     }
     
     long long int sum = 0;
-    for (size_t i = 0; i < m; ++i)
+
+    close(pipefd_sum[0]);
+    void * sum_void;
+    read(pipefd_sum[1], sum_void, sizeof(long long int) * m);
+    long long int * sub_sum = (long long *) sum_void;
+    for (int i = 0; i < m; ++i)
     {
-        close(pipefd_sum[0]);
-        void * sum_void;
-        read(pipefd_sum[1], sum_void, sizeof(long long int));
-        long long int * sub_sum = (long long *) sum_void;
-        sum += *sub_sum;
+        sum += sub_sum[i];
     }
 
     std::cout << "\n" << sum << std::endl;
+
+    delete [] array;
 }
