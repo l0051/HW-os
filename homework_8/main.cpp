@@ -24,16 +24,8 @@ int main()
     // variable for error handling
     int res;
 
-    // make a pipe for subsum
-    int pipefd_sum[2];    
-    res = pipe(pipefd_sum);
-
-    // error handling
-    if (res < 0)
-    {
-        std::cerr << "Error while creating pipe " << errno <<std::endl;
-        exit(errno);
-    }
+    // for sum
+    long long int sum = 0;
 
     // make m child process
     for (size_t i = 0; i < m; ++i)
@@ -42,6 +34,17 @@ int main()
         // make a pipe for i, j
         int pipefd_index[2];
         res = pipe(pipefd_index);
+
+        // error handling
+        if (res < 0)
+        {
+            std::cerr << "Error while creating pipe " << errno <<std::endl;
+            exit(errno);
+        }
+
+        // make a pipe for subsum
+        int pipefd_sum[2];    
+        res = pipe(pipefd_sum);
 
         // error handling
         if (res < 0)
@@ -101,16 +104,16 @@ int main()
             }
 
             // count subsum
-            long long int sum = 0;
+            long long int subsum = 0;
             for (size_t j = indexes[0]; j < indexes[1]; ++j)
             {
-                sum += array[j];
+                subsum += array[j];
             }
-            std::cout << sum << " ";
+            std::cout << subsum << " ";
             // cast to void *
-            void * sum_void = (void *) sum;
+            void * subsum_void = (void *) subsum;
             // write subsum
-            res = write(pipefd_sum[1], sum_void, sizeof(long long int)); 
+            res = write(pipefd_sum[1], subsum_void, sizeof(long long int)); 
             
             // error handling
             if (res < 0)
@@ -125,33 +128,26 @@ int main()
         if (pid > 0)
         {
             close(pipefd_index[0]);
-            //close(pipefd_sum[1]);
-            //close(pipefd_sum[0]); 
+            close(pipefd_sum[1]);
+            // for subsums
+            void * sum_void;
+            // read subsums
+            res = read(pipefd_sum[0], sum_void, sizeof(long long int) * m);
+
+            // error handling
+            if (res < 0)
+            {
+                std::cerr << "Error while reading " << errno <<std::endl;
+                exit(errno);
+            }
+            long long int * sub_sum = (long long *) sum_void;
+
+            // count sum
+            sum += *sub_sum;
         }
     }
 
     wait(NULL);
-
-    close(pipefd_sum[1]);
-    // for subsums
-    void * sum_void;
-    // read subsums
-    res = read(pipefd_sum[0], sum_void, sizeof(long long int) * m);
-
-    // error handling
-    if (res < 0)
-    {
-        std::cerr << "Error while reading " << errno <<std::endl;
-        exit(errno);
-    }
-
-    // count sum
-    long long int sum = 0;
-    long long int * sub_sum = (long long *) sum_void;
-    for (int i = 0; i < m; ++i)
-    {
-        sum += sub_sum[i];
-    }
 
     // print sum
     std::cout << "\n" << sum << std::endl;
