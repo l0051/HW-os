@@ -38,6 +38,7 @@ int main()
     // make m child process
     for (size_t i = 0; i < m; ++i)
     {
+        
         // make a pipe for i, j
         int pipefd_index[2];
         res = pipe(pipefd_index);
@@ -48,7 +49,27 @@ int main()
             std::cerr << "Error while creating pipe " << errno <<std::endl;
             exit(errno);
         }
-        
+
+        // for writing i, j
+        size_t * indexes = new size_t[2];
+        // count i, j
+        indexes[0] = (n / m) * i;
+        indexes[1] = (i + 1 == m) ? n : ((n / m) * (i + 1)); // last end
+        // cast to void *
+        void * indexes_void = (void *) &indexes;
+
+        // write indexes
+        res = write(pipefd_index[1], indexes_void, 2 * sizeof(size_t));
+            
+        // error handling
+        if (res < 0)
+        {
+            std::cerr << "Error while writing " << errno <<std::endl;
+            exit(errno);
+        }
+        // allocate memory
+        delete [] indexes;
+
         // clone the process
         pid_t pid = fork();
 
@@ -62,13 +83,13 @@ int main()
         // child process
         if (pid == 0)
         {
-            close(pipefd_index[0]);
-            close(pipefd_sum[1]);
+            close(pipefd_index[1]);
+            close(pipefd_sum[0]);
 
             // for reading i, j
             void * indexes_void;
             // read i, j
-            res = read(pipefd_index[1], indexes_void, 2 * sizeof(size_t));
+            res = read(pipefd_index[0], indexes_void, 2 * sizeof(size_t));
             // cast to size_t  *
             size_t * indexes = (size_t *) indexes_void;
 
@@ -89,12 +110,12 @@ int main()
             // cast to void *
             void * sum_void = (void *) sum;
             // write subsum
-            res = write(pipefd_sum[0], sum_void, sizeof(long long int)); 
+            res = write(pipefd_sum[1], sum_void, sizeof(long long int)); 
             
             // error handling
             if (res < 0)
             {
-                std::cerr << "Error while writing " << errno <<std::endl;
+                std::cerr << "Error while writing -" << errno <<std::endl;
                 exit(errno);
             }
             exit(0);
@@ -103,39 +124,19 @@ int main()
         // parent process
         if (pid > 0)
         {
-            close(pipefd_index[1]);
-            close(pipefd_sum[0]);
-            close(pipefd_sum[1]); 
-
-            // for writing i, j
-            size_t * indexes = new size_t[2];
-            // count i, j
-            indexes[0] = (n / m) * i;
-            indexes[1] = (i + 1 == m) ? n : ((n / m) * (i + 1)); // last end
-            // cast to void *
-            void * indexes_void = (void *) &indexes;
-
-            // write indexes
-            res = write(pipefd_index[0], indexes_void, 2 * sizeof(size_t));
-            
-            // error handling
-            if (res < 0)
-            {
-                std::cerr << "Error while writing " << errno <<std::endl;
-                exit(errno);
-            }
-
-            // ????????????????????????/
-            // wait the end of child
-            wait(NULL);
+            close(pipefd_index[0]);
+            //close(pipefd_sum[1]);
+            //close(pipefd_sum[0]); 
         }
     }
 
-    close(pipefd_sum[0]);
+    wait(NULL);
+
+    close(pipefd_sum[1]);
     // for subsums
     void * sum_void;
     // read subsums
-    res = read(pipefd_sum[1], sum_void, sizeof(long long int) * m);
+    res = read(pipefd_sum[0], sum_void, sizeof(long long int) * m);
 
     // error handling
     if (res < 0)
