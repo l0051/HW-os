@@ -58,12 +58,13 @@ int main()
         // count i, j
         indexes[0] = (n / m) * i;
         indexes[1] = (i + 1 == m) ? n : ((n / m) * (i + 1)); // last end
+        
         // cast to void *
-        void * indexes_void = (void *) &indexes;
+        void * indexes_void = (void *) indexes;
 
         // write indexes
         res = write(pipefd_index[1], indexes_void, 2 * sizeof(size_t));
-            
+
         // error handling
         if (res < 0)
         {
@@ -118,7 +119,7 @@ int main()
             // error handling
             if (res < 0)
             {
-                std::cerr << "Error while writing -" << errno <<std::endl;
+                std::cerr << "Error while writing " << errno <<std::endl;
                 exit(errno);
             }
             exit(0);
@@ -132,15 +133,15 @@ int main()
             // for subsums
             void * sum_void;
             // read subsums
-            res = read(pipefd_sum[0], sum_void, sizeof(long long int) * m);
+            res = read(pipefd_sum[0], sum_void, sizeof(long long int));
 
             // error handling
             if (res < 0)
             {
-                std::cerr << "Error while reading() " << errno <<std::endl;
+                std::cerr << "Error while reading " << errno <<std::endl;
                 exit(errno);
             }
-            long long int * sub_sum = (long long *) sum_void;
+            long long int * sub_sum = (long long int *) sum_void;
 
             // count sum
             sum += *sub_sum;
