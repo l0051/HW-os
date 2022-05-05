@@ -1,0 +1,3 @@
+/home/lusine/Desktop/OS_HW/HW-os/homework_9/cmake-build-debug/CMakeFiles/homework_9.dir
+/home/lusine/Desktop/OS_HW/HW-os/homework_9/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/lusine/Desktop/OS_HW/HW-os/homework_9/cmake-build-debug/CMakeFiles/rebuild_cache.dir
