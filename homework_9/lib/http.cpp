@@ -6,7 +6,20 @@
 
 Request get_request(int socket_fd)
 {
+    ssize_t receivedBytes = -1;
 
+    while (receivedBytes != 0) {
+        std::string message;
+        receivedBytes = recv(socket_fd, (void *) &message, sizeof(message), 0);
+
+        if (receivedBytes < 0) {
+            std::cerr << "Could not read from client. Error: " << errno << std::endl;
+            close(socket_fd);
+            //return error Request ...
+        }
+
+        //converting
+    }
 }
 
 Response produce_response(const Request& request)

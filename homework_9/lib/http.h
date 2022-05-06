@@ -37,13 +37,13 @@ private:
     std::map<std::string, std::string> headers;
 };
 
-// read request from the socket
+// read request from the socket and convert it into Request class object
 Request get_request(int socket_fd);
 
 // produce response for given request
 Response produce_response(const Request& request);
 
-// send response to the client
+// send response to the client converting it from Response class object
 void send_response(const Response& response, int socket_fd);
 
 /* name and return value of function ?? */
