@@ -5,16 +5,19 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cerrno>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define NUM_OF_THREADS 1000
 
 class Response
 {
 public:
-    Response();
+    //Response();
 
 private:
     std::string method;
@@ -45,7 +48,7 @@ void send_response(const Response& response, int socket_fd);
 
 /* name and return value of function ?? */
 // main function for library users
-void _server_(int socket_fd);
+void run();
 
 
 #endif //HOMEWORK_9_HTTP_H
