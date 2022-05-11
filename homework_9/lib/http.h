@@ -13,38 +13,46 @@
 #include <arpa/inet.h>
 
 #define NUM_OF_THREADS 1000
+#define BUFFER_SIZE 1000
 
-class Response
+
+class Request
 {
 public:
-    //Response();
+    Request();
 
 private:
     std::string method;
     std::string path;
     std::string body;
+    std::string version;
     std::map<std::string, std::string> headers;
+
+
+    // read request from the socket and convert it into Request class object
+    void get_request(int socket_fd);
+    void parse(char * message, ssize_t received_bytes);
+
 };
 
-class Request
+class Response
 {
 public:
-    //Request();
+    Response();
 
 private:
     std::string method;
     std::string path;
+    std::string body;
+    std::string version;
     std::map<std::string, std::string> headers;
+
+    // produce response for given request
+    void produce_response(const Request& request);
+
+    // send response to the client converting it from Response class object
+    void send_response(int socket_fd) const;
 };
-
-// read request from the socket and convert it into Request class object
-Request get_request(int socket_fd);
-
-// produce response for given request
-Response produce_response(const Request& request);
-
-// send response to the client converting it from Response class object
-void send_response(const Response& response, int socket_fd);
 
 /* name and return value of function ?? */
 // main function for library users

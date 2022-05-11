@@ -1,33 +1,105 @@
 #include "http.h"
 
-//Http::Response() = default;
 
-//Http::Request() = default;
+Response::Response()
+    : method{}
+    , path{}
+    , headers{}
+    , body{}
+    , version{}
+{}
 
-Request get_request(int socket_fd)
+Request::Request()
+    : method{}
+    , path{}
+    , headers{}
+    , body{}
+    , version{}
+{}
+
+void Request::parse(char * message, ssize_t received_bytes)
 {
-    ssize_t receivedBytes = -1;
-
-    while (receivedBytes != 0) {
-        std::string message;
-        receivedBytes = recv(socket_fd, (void *) &message, sizeof(message), 0);
-
-        if (receivedBytes < 0) {
-            std::cerr << "Could not read from client. Error: " << errno << std::endl;
-            close(socket_fd);
-            //return error Request ...
+    if (method[method.size() - 1] != '\n')
+    {
+        for (int i = 0; i < received_bytes; ++i)
+        {
+            if (message[i] != ' ')
+            {
+                method.push_back(message[i]);
+            }
+            else
+            {
+                method.push_back('\n');
+            }
         }
+    }
+    else if (path[path.size() - 1] != '\n')
+    {
+        for (int i = 0; i < received_bytes; ++i)
+        {
+            if (message[i] != ' ')
+            {
+                path.push_back(message[i]);
+            }
+            else
+            {
+                path.push_back('\n');
+            }
+        }
+    }
+    else if (version[version.size() - 1] != '\n')
+    {
+        for (int i = 0; i < received_bytes; ++i)
+        {
+            version.push_back(message[i]);
+        }
+    }
+    else //headers and body
+    {
 
-        //converting
     }
 }
 
-Response produce_response(const Request& request)
+void Request::get_request(int socket_fd)
+{
+    ssize_t received_bytes = -1;
+
+    /*
+    // variables for parsing
+    int space_count = 0;
+    bool is_first_line_over = false;
+    bool is_headers_over = false;
+     */
+
+    while (received_bytes != 0) {
+        char * message = new char[BUFFER_SIZE];
+        received_bytes = recv(socket_fd, (void *) message, BUFFER_SIZE, 0);
+
+        if (received_bytes < 0) {
+            std::cerr << "Could not read from client. Error: " << errno << std::endl;
+            close(socket_fd);
+
+            //return error Request (empty one)
+            // change for not empty
+            *this = Request{};
+            return;
+        }
+        if (received_bytes == 0)
+        {
+            break;
+        }
+
+        //
+        this->parse(message, received_bytes);
+    }
+}
+
+void Response::produce_response(const Request& request)
 {
 
 }
 
-void send_response(const Response& response, int socket_fd)
+void Response::send_response(int socket_fd) const
 {
 
 }
@@ -75,9 +147,11 @@ void run()
 
         /// es thread-i argument functiai mej
         /**
-        Request request = get_request(client_socket_fd);
-        Response response = produce_response(request);
-        send_response(response, client_socket_fd);
+        Request request;
+        request.get_request(client_socket_fd);
+        Response response;
+        response.produce_response(request);
+        response.send_response(client_socket_fd);
          **/
 
     }
