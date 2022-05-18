@@ -6,6 +6,7 @@
 #include <string>
 #include <map>
 #include <cerrno>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -32,7 +33,7 @@ private:
 
     // read request from the socket and convert it into Request class object
     void get_request(int socket_fd);
-    void parse(const std::string& request, ssize_t received_bytes, bool& is_last_newline, bool& is_body_writing_started);
+    void parse(const std::string& request, ssize_t received_bytes);
 
 };
 

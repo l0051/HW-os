@@ -18,41 +18,56 @@ Request::Request()
 {}
 
 // ! parse for body and headers
-void Request::parse(const std::string& request, ssize_t received_bytes, bool& is_last_newline, bool& is_body_writing_started)
+void Request::parse(const std::string& request, ssize_t received_bytes)
 {
     int index = 0;
     while (method[method.size() - 1] != ' ' && index < received_bytes)
     {
         method.push_back(request[index]);
+        ++index;
     }
     while (path[path.size() - 1] != ' ' && index < received_bytes)
     {
         path.push_back(request[index]);
+        ++index;
     }
     while (version[version.size() - 1] != '\n' && index < received_bytes)
     {
         version.push_back(request[index]);
+        ++index;
     }
-    while (!is_body_writing_started)
+    while (index < received_bytes)
     {
-        if (is_last_newline)
+        std::string key;
+        std::string value;
+        if (request[index] == '\n')
         {
-            while (index < received_bytes && request[index] != ':')
-            {
-                    //
-            }
-            while (index < received_bytes && request[index] != '\n')
-            {
-                    //
-            }
+            ++index;
+            break;
         }
+        while (index < received_bytes && request[index] != ':')
+        {
+                key.push_back(request[index]);
+                ++index;
+        }
+        while (index < received_bytes && request[index] != '\n')
+        {
+                value.push_back(request[index]);
+                ++index;
+        }
+        headers.insert({key, value});
     }
-    while (is_body_writing_started)
+    while (index < received_bytes)
     {
-//        while (body.size() < "Content-Length"'s value from map && i < received_bytes)
-//        {
-//            body.push_back(message[i]);
-//        }
+        auto it = headers.find("Content-Length");
+        if (it != headers.end())
+            break;
+        int cont_length = atoi((it->second).c_str());
+        while (body.size() < cont_length && index < received_bytes)
+        {
+           body.push_back(request[index]);
+           ++index;
+        }
     }
 }
 
@@ -80,11 +95,8 @@ void Request::get_request(int socket_fd)
         }
         request += message;
     }
-    // additional variables for parsing (body and headers)
-    bool is_last_newline = true;
-    bool is_body_writing_started = false;
 
-    this->parse(request, received_bytes, is_last_newline, is_body_writing_started);
+    this->parse(request, received_bytes);
 }
 
 void Response::produce_response(const Request& request)
@@ -96,6 +108,11 @@ void Response::send_response(int socket_fd) const
 {
     std::string response;
     // make string response
+    response += version + ' ';
+    response += status_code + ' ';
+    response += status_text + '\n';
+    // response += headers
+
     char * ch_response = const_cast<char *>(response.c_str());
     ssize_t sent_bytes = send(socket_fd, (void *) ch_response, response.size(), 0);
 
