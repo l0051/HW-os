@@ -26,12 +26,13 @@ private:
     std::string path;
     std::string body;
     std::string version;
+
     std::map<std::string, std::string> headers;
 
 
     // read request from the socket and convert it into Request class object
     void get_request(int socket_fd);
-    void parse(char * message, ssize_t received_bytes);
+    void parse(const std::string& request, ssize_t received_bytes, bool& is_last_newline, bool& is_body_writing_started);
 
 };
 
@@ -41,8 +42,8 @@ public:
     Response();
 
 private:
-    std::string method;
-    std::string path;
+    std::string status_code;
+    std::string status_text;
     std::string body;
     std::string version;
     std::map<std::string, std::string> headers;

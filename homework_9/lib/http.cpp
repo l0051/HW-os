@@ -2,8 +2,8 @@
 
 
 Response::Response()
-    : method{}
-    , path{}
+    : status_code{}
+    , status_text{}
     , headers{}
     , body{}
     , version{}
@@ -17,62 +17,52 @@ Request::Request()
     , version{}
 {}
 
-void Request::parse(char * message, ssize_t received_bytes)
+// ! parse for body and headers
+void Request::parse(const std::string& request, ssize_t received_bytes, bool& is_last_newline, bool& is_body_writing_started)
 {
-    if (method[method.size() - 1] != '\n')
+    int index = 0;
+    while (method[method.size() - 1] != ' ' && index < received_bytes)
     {
-        for (int i = 0; i < received_bytes; ++i)
+        method.push_back(request[index]);
+    }
+    while (path[path.size() - 1] != ' ' && index < received_bytes)
+    {
+        path.push_back(request[index]);
+    }
+    while (version[version.size() - 1] != '\n' && index < received_bytes)
+    {
+        version.push_back(request[index]);
+    }
+    while (!is_body_writing_started)
+    {
+        if (is_last_newline)
         {
-            if (message[i] != ' ')
+            while (index < received_bytes && request[index] != ':')
             {
-                method.push_back(message[i]);
+                    //
             }
-            else
+            while (index < received_bytes && request[index] != '\n')
             {
-                method.push_back('\n');
+                    //
             }
         }
     }
-    else if (path[path.size() - 1] != '\n')
+    while (is_body_writing_started)
     {
-        for (int i = 0; i < received_bytes; ++i)
-        {
-            if (message[i] != ' ')
-            {
-                path.push_back(message[i]);
-            }
-            else
-            {
-                path.push_back('\n');
-            }
-        }
-    }
-    else if (version[version.size() - 1] != '\n')
-    {
-        for (int i = 0; i < received_bytes; ++i)
-        {
-            version.push_back(message[i]);
-        }
-    }
-    else //headers and body
-    {
-
+//        while (body.size() < "Content-Length"'s value from map && i < received_bytes)
+//        {
+//            body.push_back(message[i]);
+//        }
     }
 }
 
+// done.
 void Request::get_request(int socket_fd)
 {
     ssize_t received_bytes = -1;
-
-    /*
-    // variables for parsing
-    int space_count = 0;
-    bool is_first_line_over = false;
-    bool is_headers_over = false;
-     */
-
+    std::string request;
     while (received_bytes != 0) {
-        char * message = new char[BUFFER_SIZE];
+        char* message = new char[BUFFER_SIZE];
         received_bytes = recv(socket_fd, (void *) message, BUFFER_SIZE, 0);
 
         if (received_bytes < 0) {
@@ -88,10 +78,13 @@ void Request::get_request(int socket_fd)
         {
             break;
         }
-
-        //
-        this->parse(message, received_bytes);
+        request += message;
     }
+    // additional variables for parsing (body and headers)
+    bool is_last_newline = true;
+    bool is_body_writing_started = false;
+
+    this->parse(request, received_bytes, is_last_newline, is_body_writing_started);
 }
 
 void Response::produce_response(const Request& request)
@@ -101,12 +94,15 @@ void Response::produce_response(const Request& request)
 
 void Response::send_response(int socket_fd) const
 {
+    std::string response;
+    // make string response
+    char * ch_response = const_cast<char *>(response.c_str());
+    ssize_t sent_bytes = send(socket_fd, (void *) ch_response, response.size(), 0);
 
 }
 
 void run()
 {
-
     int port = 8080;
 
     int server_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -119,7 +115,7 @@ void run()
     struct sockaddr_in address{};
 
     address.sin_family = AF_INET;
-    address.sin_port = htons(port); // port?
+    address.sin_port = htons(port);
     address.sin_addr.s_addr = htonl(INADDR_ANY);
 
     int bound = bind(server_socket_fd, (const struct sockaddr *) &address, sizeof(address));
@@ -136,7 +132,7 @@ void run()
         exit(errno);
     }
 
-    //thread pool .. ?creating
+    //thread pool ..
 
     while (true) {
         struct sockaddr_in client_address{};
