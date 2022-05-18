@@ -111,11 +111,21 @@ void Response::send_response(int socket_fd) const
     response += version + ' ';
     response += status_code + ' ';
     response += status_text + '\n';
-    // response += headers
-
+    for (std::pair<std::string, std::string> elem : headers)
+    {
+        response += elem.first + ' ' + elem.second + '\n';
+    }
+    if (!body.empty())
+    {
+        response += '\n' + body;
+    }
     char * ch_response = const_cast<char *>(response.c_str());
     ssize_t sent_bytes = send(socket_fd, (void *) ch_response, response.size(), 0);
-
+    if (sent_bytes < 0)
+    {
+        std::cerr << "Could not write to client. Error: " << errno << std::endl;
+        close(socket_fd);
+    }
 }
 
 void run()
