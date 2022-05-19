@@ -2,12 +2,12 @@
 
 Http_Server::Http_Server(int port)
     : port(port)
-    , path_method_to_response{}
+    , path_method_to_handle{}
 {}
 
 Http_Server::Http_Server()
         : port(8080)
-        , path_method_to_response{}
+        , path_method_to_handle{}
 {}
 
 Http_Server::Response::Response()
@@ -128,6 +128,11 @@ void Http_Server::Response::send_response(int socket_fd) const
         std::cerr << "Could not write to client. Error: " << errno << std::endl;
         close(socket_fd);
     }
+}
+
+void Http_Server::add_handler(const std::string& path, const std::string& method, Handler* handler)
+{
+    path_method_to_handle.insert({{path, method}, handler});
 }
 
 void Http_Server::run()

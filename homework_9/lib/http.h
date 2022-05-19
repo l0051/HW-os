@@ -1,7 +1,6 @@
 #ifndef HOMEWORK_9_HTTP_H
 #define HOMEWORK_9_HTTP_H
 
-
 #include <iostream>
 #include <string>
 #include <map>
@@ -68,18 +67,19 @@ private:
         void send_response(int socket_fd) const;
     };
 
-    std::map<std::pair<std::string , std::string>, Handler*> path_method_to_response;
+    std::map<std::pair<std::string , std::string>, Handler*> path_method_to_handle;
     int port;
 public:
-/* name and return value of function ?? */
-// main function for library users
+    /* name and return value of function ?? */
+    // main function for library users
     void run();
 
     struct Handler
     {
-        virtual Response produce_response(const Request& request) = 0;
+        virtual Response handle(const Request& request) = 0;
     };
 
+    void add_handler(const std::string& path, const std::string& method, Handler* handler);
 };
 
 #endif //HOMEWORK_9_HTTP_H
