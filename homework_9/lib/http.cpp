@@ -1,7 +1,16 @@
 #include "http.h"
 
+Http_Server::Http_Server(int port)
+    : port(port)
+    , path_method_to_response{}
+{}
 
-Response::Response()
+Http_Server::Http_Server()
+        : port(8080)
+        , path_method_to_response{}
+{}
+
+Http_Server::Response::Response()
     : status_code{}
     , status_text{}
     , headers{}
@@ -9,7 +18,7 @@ Response::Response()
     , version{}
 {}
 
-Request::Request()
+Http_Server::Request::Request()
     : method{}
     , path{}
     , headers{}
@@ -17,8 +26,7 @@ Request::Request()
     , version{}
 {}
 
-// ! parse for body and headers
-void Request::parse(const std::string& request, ssize_t received_bytes)
+void Http_Server::Request::parse(const std::string& request, ssize_t received_bytes)
 {
     int index = 0;
     while (method[method.size() - 1] != ' ' && index < received_bytes)
@@ -71,8 +79,7 @@ void Request::parse(const std::string& request, ssize_t received_bytes)
     }
 }
 
-// done.
-void Request::get_request(int socket_fd)
+void Http_Server::Request::get_request(int socket_fd)
 {
     ssize_t received_bytes = -1;
     std::string request;
@@ -99,12 +106,7 @@ void Request::get_request(int socket_fd)
     this->parse(request, received_bytes);
 }
 
-void Response::produce_response(const Request& request)
-{
-
-}
-
-void Response::send_response(int socket_fd) const
+void Http_Server::Response::send_response(int socket_fd) const
 {
     std::string response;
     // make string response
@@ -128,10 +130,8 @@ void Response::send_response(int socket_fd) const
     }
 }
 
-void run()
+void Http_Server::run()
 {
-    int port = 8080;
-
     int server_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     if(server_socket_fd < 0){
@@ -159,14 +159,16 @@ void run()
         exit(errno);
     }
 
-    //thread pool ..
+    // Launch the pool with NUM_OF_THREADS threads.
+    boost::asio::thread_pool pool(NUM_OF_THREADS);
 
     while (true) {
         struct sockaddr_in client_address{};
         unsigned int client_address_length;
         int client_socket_fd = accept(server_socket_fd,(struct sockaddr*)  &client_address, &client_address_length);
 
-        /// stex piti kcenq functian thread pool
+        // Submit a function to the pool.
+        boost::asio::post(pool, my_task);
 
         /// es thread-i argument functiai mej
         /**
@@ -179,3 +181,4 @@ void run()
 
     }
 }
+
