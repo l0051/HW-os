@@ -37,12 +37,12 @@ private:
         std::string path;
         std::string body;
         std::string version;
-
         std::map<std::string, std::string> headers;
-
 
         // read request from the socket and convert it into Request class object
         void get_request(int socket_fd);
+
+        // set data from given string to class members
         void parse(const std::string& request, ssize_t received_bytes);
 
     };
@@ -58,27 +58,26 @@ private:
         std::string body;
         std::string version;
         std::map<std::string, std::string> headers;
-/*
-        // produce response for given request
-        void produce_response(const Request& request);
-*/
 
-        // send response to the client converting it from Response class object
+        // send response to the client converting it from Response class object to bytes
         void send_response(int socket_fd) const;
     };
 
+    // map of handlers for certain path and method
     std::map<std::pair<std::string , std::string>, Handler*> path_method_to_handle;
     int port;
 public:
-    /* name and return value of function ?? */
+
     // main function for library users
     void run();
 
+    // struct for function to produce response for given request
     struct Handler
     {
         virtual Response handle(const Request& request) = 0;
     };
 
+    // function for adding handler for certain path and method
     void add_handler(const std::string& path, const std::string& method, Handler* handler);
 };
 

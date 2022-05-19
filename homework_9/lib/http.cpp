@@ -29,21 +29,25 @@ Http_Server::Request::Request()
 void Http_Server::Request::parse(const std::string& request, ssize_t received_bytes)
 {
     int index = 0;
+    // set method
     while (method[method.size() - 1] != ' ' && index < received_bytes)
     {
         method.push_back(request[index]);
         ++index;
     }
+    // set path
     while (path[path.size() - 1] != ' ' && index < received_bytes)
     {
         path.push_back(request[index]);
         ++index;
     }
+    // set version
     while (version[version.size() - 1] != '\n' && index < received_bytes)
     {
         version.push_back(request[index]);
         ++index;
     }
+    // set headers
     while (index < received_bytes)
     {
         std::string key;
@@ -65,6 +69,7 @@ void Http_Server::Request::parse(const std::string& request, ssize_t received_by
         }
         headers.insert({key, value});
     }
+    // set body
     while (index < received_bytes)
     {
         auto it = headers.find("Content-Length");
@@ -85,8 +90,11 @@ void Http_Server::Request::get_request(int socket_fd)
     std::string request;
     while (received_bytes != 0) {
         char* message = new char[BUFFER_SIZE];
+
+        // receive BUFFER_SIZE bytes from socket
         received_bytes = recv(socket_fd, (void *) message, BUFFER_SIZE, 0);
 
+        // error handling
         if (received_bytes < 0) {
             std::cerr << "Could not read from client. Error: " << errno << std::endl;
             close(socket_fd);
@@ -96,10 +104,13 @@ void Http_Server::Request::get_request(int socket_fd)
             *this = Request{};
             return;
         }
+
         if (received_bytes == 0)
         {
             break;
         }
+
+        // add received to request string
         request += message;
     }
 
@@ -109,6 +120,7 @@ void Http_Server::Request::get_request(int socket_fd)
 void Http_Server::Response::send_response(int socket_fd) const
 {
     std::string response;
+
     // make string response
     response += version + ' ';
     response += status_code + ' ';
@@ -121,8 +133,14 @@ void Http_Server::Response::send_response(int socket_fd) const
     {
         response += '\n' + body;
     }
+
+    // cast to char*
     char * ch_response = const_cast<char *>(response.c_str());
+
+    // send bytes to socket
     ssize_t sent_bytes = send(socket_fd, (void *) ch_response, response.size(), 0);
+
+    // error handling
     if (sent_bytes < 0)
     {
         std::cerr << "Could not write to client. Error: " << errno << std::endl;
