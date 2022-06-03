@@ -2,6 +2,7 @@
 #include "lib/http.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Http_Server server(8080);
+    server.run();
     return 0;
 }
