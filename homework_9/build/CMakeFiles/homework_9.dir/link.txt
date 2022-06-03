@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/homework_9.dir/main.cpp.o CMakeFiles/homework_9.dir/lib/http.cpp.o  -o homework_9  /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0 /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0 /usr/lib/x86_64-linux-gnu/libboost_atomic.so.1.71.0 -lpthread 

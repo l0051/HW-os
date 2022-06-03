@@ -1,3 +1,0 @@
-/home/lusine/Desktop/OS_HW/HW-os/homework_9/build/CMakeFiles/rebuild_cache.dir
-/home/lusine/Desktop/OS_HW/HW-os/homework_9/build/CMakeFiles/edit_cache.dir
-/home/lusine/Desktop/OS_HW/HW-os/homework_9/build/CMakeFiles/homework_9.dir
