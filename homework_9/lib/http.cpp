@@ -153,6 +153,15 @@ void Http_Server::add_handler(const std::string& path, const std::string& method
     path_method_to_handle.insert({{path, method}, handler});
 }
 
+void Http_Server::my_task(int client_socket_fd)
+{
+    Http_Server::Request request;
+    request.get_request(client_socket_fd);
+    Http_Server::Response response = (path_method_to_handle[{request.path, request.method}]->handle)(request);
+    response.send_response(client_socket_fd);
+}
+
+
 void Http_Server::run()
 {
     int server_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -191,17 +200,9 @@ void Http_Server::run()
         int client_socket_fd = accept(server_socket_fd,(struct sockaddr*)  &client_address, &client_address_length);
 
         // Submit a function to the pool.
-        boost::asio::post(pool, my_task);
-
-        /// es thread-i argument functiai mej
-        /**
-        Request request;
-        request.get_request(client_socket_fd);
-        Response response;
-        response.produce_response(request);
-        response.send_response(client_socket_fd);
-         **/
+        boost::asio::post(pool, std::bind(my_task, this, client_socket_fd));
 
     }
 }
+
 

@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <functional>
 
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
@@ -25,51 +26,48 @@ public:
     struct Handler;
     explicit Http_Server(int port);
     Http_Server();
+    // main function for library users
+    void run();
 private:
 
     class Request
     {
     public:
         Request();
-
-    private:
-        std::string method;
-        std::string path;
-        std::string body;
-        std::string version;
-        std::map<std::string, std::string> headers;
-
         // read request from the socket and convert it into Request class object
         void get_request(int socket_fd);
 
         // set data from given string to class members
         void parse(const std::string& request, ssize_t received_bytes);
 
+        std::string method;
+        std::string path;
+
+    private:
+        std::string body;
+        std::string version;
+        std::map<std::string, std::string> headers;
     };
 
     class Response
     {
     public:
         Response();
-
+        // send response to the client converting it from Response class object to bytes
+        void send_response(int socket_fd) const;
     private:
         std::string status_code;
         std::string status_text;
         std::string body;
         std::string version;
         std::map<std::string, std::string> headers;
-
-        // send response to the client converting it from Response class object to bytes
-        void send_response(int socket_fd) const;
     };
 
     // map of handlers for certain path and method
     std::map<std::pair<std::string , std::string>, Handler*> path_method_to_handle;
     int port;
 public:
-
-    // main function for library users
-    void run();
+    void my_task(int client_socket_fd);
 
     // struct for function to produce response for given request
     struct Handler
