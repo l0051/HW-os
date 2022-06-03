@@ -31,8 +31,6 @@ netinet/in.h
 -
 arpa/inet.h
 -
-functional
--
 boost/asio/thread_pool.hpp
 -
 boost/asio/post.hpp

@@ -200,7 +200,7 @@ void Http_Server::run()
         int client_socket_fd = accept(server_socket_fd,(struct sockaddr*)  &client_address, &client_address_length);
 
         // Submit a function to the pool.
-        boost::asio::post(pool, std::bind(my_task, this, client_socket_fd));
+        boost::asio::post(pool, [this, client_socket_fd] { my_task(client_socket_fd); });
 
     }
 }

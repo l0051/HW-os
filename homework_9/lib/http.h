@@ -11,7 +11,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <functional>
 
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
